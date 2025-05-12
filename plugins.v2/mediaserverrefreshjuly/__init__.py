@@ -9,6 +9,7 @@ from app.log import logger
 from app.plugins import _PluginBase
 from app.schemas import TransferInfo, RefreshMediaItem, ServiceInfo
 from app.schemas.types import EventType
+from app.core.config import settings
 
 
 class MediaServerRefreshJuly(_PluginBase):
