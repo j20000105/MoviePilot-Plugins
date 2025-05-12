@@ -21,7 +21,7 @@ class MediaServerRefreshJuly(_PluginBase):
     # 插件图标
     plugin_icon = "refresh2.png"
     # 插件版本
-    plugin_version = "3.1.7"
+    plugin_version = "3.1.9"
     # 插件作者
     plugin_author = "jxxghp,july"
     # 作者主页
@@ -184,6 +184,11 @@ class MediaServerRefreshJuly(_PluginBase):
         if not self.service_infos:
             return
 
+        # 入库数据
+        transferinfo: TransferInfo = event_info.get("transferinfo")
+        if not transferinfo or not transferinfo.target_diritem or not transferinfo.target_diritem.path:
+            return
+
         if self._delay:
             delay = float(self._delay)
             target_path = Path(transferinfo.target_diritem.path)
@@ -217,11 +222,6 @@ class MediaServerRefreshJuly(_PluginBase):
 
             logger.info(f"延迟 {self._delay} 秒后刷新媒体库... ")
             time.sleep(float(self._delay))
-
-        # 入库数据
-        transferinfo: TransferInfo = event_info.get("transferinfo")
-        if not transferinfo or not transferinfo.target_diritem or not transferinfo.target_diritem.path:
-            return
 
         mediainfo: MediaInfo = event_info.get("mediainfo")
         items = [
