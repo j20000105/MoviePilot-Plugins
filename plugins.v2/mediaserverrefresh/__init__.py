@@ -19,7 +19,7 @@ class MediaServerRefresh(_PluginBase):
     # 插件图标
     plugin_icon = "refresh2.png"
     # 插件版本
-    plugin_version = "1.3.2"
+    plugin_version = "3.1.0"
     # 插件作者
     plugin_author = "jxxghp"
     # 作者主页
@@ -192,6 +192,13 @@ class MediaServerRefresh(_PluginBase):
             return
 
         mediainfo: MediaInfo = event_info.get("mediainfo")
+
+        logger.info(f"July-Test 分类：{mediainfo.category}")
+        target_path = Path(transferinfo.target_diritem.path)
+        logger.info(f"July-Test 路径：{target_path}")
+        config_path = Path(settings.CONFIG_PATH)
+        logger.info(f"July-Test Config：{config_path}")
+
         items = [
             RefreshMediaItem(
                 title=mediainfo.title,
