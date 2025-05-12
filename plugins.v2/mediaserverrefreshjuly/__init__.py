@@ -20,7 +20,7 @@ class MediaServerRefreshJuly(_PluginBase):
     # 插件图标
     plugin_icon = "refresh2.png"
     # 插件版本
-    plugin_version = "3.1.2"
+    plugin_version = "3.1.3"
     # 插件作者
     plugin_author = "jxxghp,july"
     # 作者主页
@@ -188,8 +188,8 @@ class MediaServerRefreshJuly(_PluginBase):
             target_path = Path(transferinfo.target_diritem.path)
             target_path_hash = sha1(str(target_path).encode()).hexdigest()
             
-            config_path = Path(settings.CONFIG_PATH)
-            lock_path = config_path / "media_refresh_lock" / f"{target_path_hash}.lock"
+            temp_path = Path(settings.TEMP_PATH)
+            lock_path = temp_path / "media_refresh_lock" / f"{target_path_hash}.lock"
 
             try:
                 # 如果存在该文件，检查是否达到定时任务执行时间，如果没有达到，则说明未来某一时刻这个任务将被执行，直接返回
