@@ -65,13 +65,14 @@
     },
     "MediaServerRefreshJuly": {
         "name": "媒体库服务器刷新",
-        "description": "入库后自动刷新Emby/Jellyfin/Plex服务器海报墙。",
+        "description": "入库后自动刷新Emby/Jellyfin/Plex服务器海报墙。限制刷新频率 By July",
         "labels": "媒体库",
-        "version": "3.1.1",
+        "version": "3.1.2",
         "icon": "refresh2.png",
-        "author": "jxxghp",
+        "author": "jxxghp,july",
         "level": 1,
         "history": {
+            "v3.1.2": "降低刷新频次，同一目录只刷新一次",
             "v3.1.1": "调试日志",
             "v1.3.2": "适配飞牛媒体库",
             "v1.3.1": "修复兼容性问题",

@@ -20,9 +20,9 @@ class MediaServerRefreshJuly(_PluginBase):
     # 插件图标
     plugin_icon = "refresh2.png"
     # 插件版本
-    plugin_version = "3.1.0"
+    plugin_version = "3.1.2"
     # 插件作者
-    plugin_author = "jxxghp"
+    plugin_author = "jxxghp,july"
     # 作者主页
     author_url = "https://github.com/jxxghp"
     # 插件配置项ID前缀
@@ -184,6 +184,35 @@ class MediaServerRefreshJuly(_PluginBase):
             return
 
         if self._delay:
+            delay = float(self._delay)
+            target_path = Path(transferinfo.target_diritem.path)
+            target_path_hash = sha1(str(target_path).encode()).hexdigest()
+            
+            config_path = Path(settings.CONFIG_PATH)
+            lock_path = config_path / "media_refresh_lock" / f"{target_path_hash}.lock"
+
+            try:
+                # 如果存在该文件，检查是否达到定时任务执行时间，如果没有达到，则说明未来某一时刻这个任务将被执行，直接返回
+                if lock_path.exists():
+                    with lock_path.open("r") as f:
+                        content = f.read()
+                        if content:
+                            lock_time = float(content)
+                            if time.time() < lock_time:
+                                lock_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(lock_time))
+                                logger.info(f"当前目录 [{target_path}] 已有任务等待执行，将在 {lock_time_str} 进行刷新，本次取消.")
+                                return
+
+                lock_path.parent.mkdir(parents=True, exist_ok=True)
+                lock_path.touch(exist_ok=True)
+                run_time = time.time() + delay
+                run_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(run_time))
+                with lock_path.open("w") as f:
+                    f.write(str(run_time))
+                logger.info(f"任务将于 {run_time_str} 执行")
+            except Exception as e:
+                logger.info(f"锁定失败，刷新任务继续执行，失败原因: {e}")
+
             logger.info(f"延迟 {self._delay} 秒后刷新媒体库... ")
             time.sleep(float(self._delay))
 
@@ -193,13 +222,6 @@ class MediaServerRefreshJuly(_PluginBase):
             return
 
         mediainfo: MediaInfo = event_info.get("mediainfo")
-
-        logger.info(f"July-Test 分类：{mediainfo.category}")
-        target_path = Path(transferinfo.target_diritem.path)
-        logger.info(f"July-Test 路径：{target_path}")
-        config_path = Path(settings.CONFIG_PATH)
-        logger.info(f"July-Test Config：{config_path}")
-
         items = [
             RefreshMediaItem(
                 title=mediainfo.title,
