@@ -9,7 +9,7 @@ from app.helper.mediaserver import MediaServerHelper
 from app.log import logger
 from app.plugins import _PluginBase
 from app.schemas import TransferInfo, RefreshMediaItem, ServiceInfo
-from app.schemas.types import EventType
+from app.schemas.types import EventType, MediaType
 from app.core.config import settings
 
 
@@ -21,7 +21,7 @@ class MediaServerRefreshJuly(_PluginBase):
     # 插件图标
     plugin_icon = "refresh2.png"
     # 插件版本
-    plugin_version = "3.1.9"
+    plugin_version = "3.2.1"
     # 插件作者
     plugin_author = "jxxghp,july"
     # 作者主页
@@ -38,6 +38,7 @@ class MediaServerRefreshJuly(_PluginBase):
     _enabled = False
     _delay = 0
     _mediaservers = None
+    _tv_lock_mode = "parent"
 
     def init_plugin(self, config: dict = None):
         self.mediaserver_helper = MediaServerHelper()
@@ -45,6 +46,7 @@ class MediaServerRefreshJuly(_PluginBase):
             self._enabled = config.get("enabled")
             self._delay = config.get("delay") or 0
             self._mediaservers = config.get("mediaservers") or []
+            self._tv_lock_mode = config.get("tv_lock_mode") or "parent"
 
     @property
     def service_infos(self) -> Optional[Dict[str, ServiceInfo]]:
@@ -157,12 +159,37 @@ class MediaServerRefreshJuly(_PluginBase):
                                 ]
                             }
                         ]
+                    },
+                    {
+                        'component': 'VRow',
+                        'content': [
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VSelect',
+                                        'props': {
+                                            'model': 'tv_lock_mode',
+                                            'label': '剧集加锁目录，默认上级目录。其余类型都会按照上级目录加锁。',
+                                            'items': [
+                                                {'title': '上级目录', 'value': 'parent'},
+                                                {'title': '当前目录', 'value': 'current'}
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
         ], {
             "enabled": False,
-            "delay": 0
+            "delay": 0,
+            "tv_lock_mode": "parent"
         }
 
     def get_page(self) -> List[dict]:
@@ -189,9 +216,18 @@ class MediaServerRefreshJuly(_PluginBase):
         if not transferinfo or not transferinfo.target_diritem or not transferinfo.target_diritem.path:
             return
 
+        mediainfo: MediaInfo = event_info.get("mediainfo")
+
         if self._delay:
             delay = float(self._delay)
+
             target_path = Path(transferinfo.target_diritem.path)
+            if mediainfo.type == MediaType.TV and self._tv_lock_mode == "current":
+                logger.info("媒体类型为剧集，且选择为当前目录加锁")
+            else:
+                target_path = target_path.parent
+
+            logger.info(f"加锁目录: {target_path}")
             target_path_hash = sha1(str(target_path).encode()).hexdigest()
             
             temp_path = Path(settings.CONFIG_PATH)
@@ -216,14 +252,14 @@ class MediaServerRefreshJuly(_PluginBase):
                 run_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(run_time))
                 with lock_path.open("w") as f:
                     f.write(str(run_time))
-                logger.info(f"任务将于 {run_time_str} 执行")
+                logger.info(f"目录 [{target_path}] 刷新任务将于 {run_time_str} 执行")
             except Exception as e:
                 logger.info(f"锁定失败，刷新任务继续执行，失败原因: {e}")
 
             logger.info(f"延迟 {self._delay} 秒后刷新媒体库... ")
             time.sleep(float(self._delay))
 
-        mediainfo: MediaInfo = event_info.get("mediainfo")
+        
         items = [
             RefreshMediaItem(
                 title=mediainfo.title,
