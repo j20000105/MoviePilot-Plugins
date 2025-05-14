@@ -10,7 +10,7 @@ from app.schemas.types import EventType, MediaType, MediaImageType, Notification
 from app.utils.web import WebUtils
 
 
-class MediaServerMsg(_PluginBase):
+class MediaServerMsgJuly(_PluginBase):
     # 插件名称
     plugin_name = "媒体库服务器通知"
     # 插件描述
@@ -18,9 +18,9 @@ class MediaServerMsg(_PluginBase):
     # 插件图标
     plugin_icon = "mediaplay.png"
     # 插件版本
-    plugin_version = "1.5"
+    plugin_version = "3.1.0"
     # 插件作者
-    plugin_author = "jxxghp"
+    plugin_author = "jxxghp,july"
     # 作者主页
     author_url = "https://github.com/jxxghp"
     # 插件配置项ID前缀
@@ -315,6 +315,7 @@ class MediaServerMsg(_PluginBase):
         # 消息内容
         message_content = "\n".join(message_texts)
 
+        logger.info(f"event_info: {event_info.dict()}")
         # 消息图片
         image_url = event_info.image_url
         # 查询剧集图片
