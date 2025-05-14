@@ -18,7 +18,7 @@ class MediaServerMsgJuly(_PluginBase):
     # 插件图标
     plugin_icon = "mediaplay.png"
     # 插件版本
-    plugin_version = "3.1.0"
+    plugin_version = "3.1.1"
     # 插件作者
     plugin_author = "jxxghp,july"
     # 作者主页
@@ -328,6 +328,17 @@ class MediaServerMsgJuly(_PluginBase):
                 image_type=MediaImageType.Backdrop,
                 season=event_info.season_id,
                 episode=event_info.episode_id
+            )
+            if specific_image:
+                image_url = specific_image
+        # 只查询剧集信息
+        if (
+            not image_url
+            and event_info.tmdb_id):
+            specific_image = self.chain.obtain_specific_image(
+                mediaid=event_info.tmdb_id,
+                mtype=MediaType.TV,
+                image_type=MediaImageType.Backdrop,
             )
             if specific_image:
                 image_url = specific_image
