@@ -84,12 +84,12 @@
         "name": "媒体库服务器通知",
         "description": "发送Emby/Jellyfin/Plex服务器的播放、入库等通知消息。",
         "labels": "消息通知,媒体库",
-        "version": "3.1.1",
+        "version": "3.1.2",
         "icon": "mediaplay.png",
         "author": "jxxghp,july",
         "level": 1,
         "history": {
-            "v3.1.1": "剧集图片",
+            "v3.1.2": "剧集图片",
             "v1.5": "支持独立控制媒体服务器通知",
             "v1.4": "MoviePilot V2 版本媒体库服务器通知插件"
         }

@@ -18,7 +18,7 @@ class MediaServerMsgJuly(_PluginBase):
     # 插件图标
     plugin_icon = "mediaplay.png"
     # 插件版本
-    plugin_version = "3.1.1"
+    plugin_version = "3.1.2"
     # 插件作者
     plugin_author = "jxxghp,july"
     # 作者主页
@@ -315,7 +315,6 @@ class MediaServerMsgJuly(_PluginBase):
         # 消息内容
         message_content = "\n".join(message_texts)
 
-        logger.info(f"event_info: {event_info.dict()}")
         # 消息图片
         image_url = event_info.image_url
         # 查询剧集图片
@@ -339,6 +338,16 @@ class MediaServerMsgJuly(_PluginBase):
                 mediaid=event_info.tmdb_id,
                 mtype=MediaType.TV,
                 image_type=MediaImageType.Backdrop,
+            )
+            if specific_image:
+                image_url = specific_image
+        if (
+            not image_url
+            and event_info.tmdb_id):
+            specific_image = self.chain.obtain_specific_image(
+                mediaid=event_info.tmdb_id,
+                mtype=MediaType.TV,
+                image_type=MediaImageType.Poster,
             )
             if specific_image:
                 image_url = specific_image
